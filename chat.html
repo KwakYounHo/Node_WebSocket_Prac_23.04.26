@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const form   = document.createElement('form');
+    const root   = document.createElement('div');
+    const text   = document.createElement('input');
+    const submit = document.createElement('input');
+
+    root.id = 'root'
+
+    document.body.appendChild(root);
+    root.appendChild(form);
+    form.appendChild(text);
+    form.appendChild(submit);
+
+    Object.assign(text, {
+      type        : 'text',
+      name        : 'text',
+      placeholder : '텍스트 입력'
+    })
+    Object.assign(submit, {
+      type        : 'submit',
+      name        : 'submit',
+      vlaue       : '전송'
+    })
+
+    const socket = io.connect('localhost:8080')
+    socket.emit('EnterUser', '사람')
+    socket.on('GoodDay', data => {
+      const element     = document.createElement('h5');
+      element.innerText = data;
+      // document.body.appendChild(element);
+      root.insertBefore(element, form);
+    })
+    socket.on('chat', data => {
+      const element = document.createElement('p');
+      element.innerText = data;
+      root.appendChild(element);
+    })
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      socket.emit('chat', form.text.value);
+      form.text.value = '';
+    })
+  </script>
+</body>
+</html>
